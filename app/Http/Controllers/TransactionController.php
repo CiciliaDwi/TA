@@ -1,0 +1,168 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Http\Controllers\Controller;
+use App\Models\Barang;
+use App\Models\Nota_Jual;
+use App\Models\Nota_Jual_Detil;
+use App\Models\Pelanggan;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+
+class TransactionController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
+        $users = User::all();
+        $products = Barang::where('Stok', '>', 0)->get();
+        $customers = Pelanggan::all();
+        $paymentMethods = ['cash', 'debit', 'kredit'];
+
+        return view('transaksi.transaction', compact('users', 'products', 'paymentMethods', 'customers'));
+    }
+
+
+    public function dashboard()
+    {
+        $recentTransactions = Nota_Jual::with(['pegawai', 'detil'])
+            ->orderBy('Tanggal', 'desc')
+            ->take(10)
+            ->get();
+
+        return view('home', compact('recentTransactions'));
+    }
+
+
+    public function getLastNotaNumber()
+    {
+        try {
+            $today = now()->format('ymd');
+            $prefix = 'NJ' . $today;
+
+            $lastNota = Nota_Jual::where('NoNota', 'like', $prefix . '%')
+                ->orderBy('NoNota', 'desc')
+                ->first();
+
+            if ($lastNota) {
+                $lastNumber = intval(substr($lastNota->NoNota, -3));
+                $nextNumber = $lastNumber + 1;
+            } else {
+                $nextNumber = 1;
+            }
+
+            return response()->json(['last_number' => $nextNumber]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        //
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        try {
+            DB::beginTransaction();
+
+            // Validasi stok terlebih dahulu
+            foreach ($request->products as $key => $product_id) {
+                $quantity = $request->quantities[$key];
+                $barang = Barang::find($product_id);
+                
+                if (!$barang) {
+                    throw new \Exception("Produk tidak ditemukan!");
+                }
+                
+                if ($barang->Stok < $quantity) {
+                    throw new \Exception("Stok {$barang->NamaBarang} tidak mencukupi! Stok tersedia: {$barang->Stok}");
+                }
+            }
+
+            $transaction = Nota_Jual::create([
+                'NoNota' => $request->no_nota,
+                'Tanggal' => now(),
+                'id_pegawai' => $request->cashier_name,
+                'metode_pembayaran' => $request->payment_method
+            ]);
+
+            $grandTotal = 0;
+
+            foreach ($request->products as $key => $product_id) {
+                $quantity = $request->quantities[$key];
+                $price = $request->product_prices[$key];
+                $subtotal = $quantity * $price;
+                $grandTotal += $subtotal;
+
+                Nota_Jual_Detil::create([
+                    'NoNota' => $transaction->NoNota,
+                    'KodeBarang' => $product_id,
+                    'Jumlah' => $quantity,
+                    'Harga' => $price,
+                    'Total' => $subtotal
+                ]);
+
+                $barang = Barang::find($product_id);
+                $barang->Stok -= $quantity;
+                $barang->save();
+            }
+
+            $transaction->update(['total' => $grandTotal]);
+
+            DB::commit();
+            return redirect()->route('transactions.index')
+                ->with('success', 'Transaksi berhasil disimpan!');
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            return redirect()->route('transactions.index')
+                ->with('error', 'Transaksi gagal: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(Nota_Jual $nota_Jual)
+    {
+        $nota_Jual->load(['detil.barang', 'pegawai']);
+        return view('transaksi.transactions.show', compact('nota_Jual'));
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(string $id)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, string $id)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id)
+    {
+        //
+    }
+}
