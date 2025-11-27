@@ -13,6 +13,7 @@ class User extends Authenticatable
     use HasApiTokens, HasFactory, Notifiable;
 
     protected $table = 'users';
+
     /**
      * The attributes that are mass assignable.
      *
@@ -26,7 +27,7 @@ class User extends Authenticatable
         'username',
         'password',
         'jabatan',
-        
+
     ];
 
     protected $hidden = [
@@ -49,7 +50,8 @@ class User extends Authenticatable
         return $this->jabatan === 'kasir';
     }
 
-    public function notaJual(){
+    public function notaJual()
+    {
         return $this->hasMany(Nota_Jual::class, 'id_pegawai', 'id');
     }
 
@@ -60,7 +62,6 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'password' => 'hashed',
     ];
-
-    
 }
