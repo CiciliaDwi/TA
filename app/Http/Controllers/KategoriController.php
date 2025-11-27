@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\Kategori;
 use Illuminate\Http\Request;
 
@@ -14,6 +13,7 @@ class KategoriController extends Controller
     public function index()
     {
         $categories = Kategori::all();
+
         return view('kategori.listkategori', compact('categories'));
     }
 
@@ -32,21 +32,21 @@ class KategoriController extends Controller
     {
         $request->validate([
             'kode_kategori' => 'required|string|size:2|regex:/^[0-9]+$/|unique:kategori,KodeKategori',
-            'nama' => 'required|string|max:255'
+            'nama' => 'required|string|max:255',
         ], [
             'kode_kategori.required' => 'Kode kategori harus diisi',
             'kode_kategori.size' => 'Kode kategori harus 2 digit',
             'kode_kategori.regex' => 'Kode kategori harus berupa angka',
             'kode_kategori.unique' => 'Kode kategori sudah digunakan',
             'nama.required' => 'Nama kategori harus diisi',
-            'nama.max' => 'Nama kategori maksimal 255 karakter'
+            'nama.max' => 'Nama kategori maksimal 255 karakter',
         ]);
-    
-        $kategori = new Kategori();
+
+        $kategori = new Kategori;
         $kategori->KodeKategori = $request->kode_kategori;
         $kategori->Nama = $request->nama;
         $kategori->save();
-    
+
         return redirect()->route('categories.index')
             ->with('success', 'Kategori berhasil ditambahkan');
     }
@@ -65,6 +65,7 @@ class KategoriController extends Controller
     public function edit(string $id)
     {
         $category = Kategori::findOrFail($id);
+
         return view('kategori.edit', compact('category'));
     }
 
@@ -74,7 +75,7 @@ class KategoriController extends Controller
     public function update(Request $request, string $id)
     {
         $request->validate([
-            'nama' => 'required|string|max:255'
+            'nama' => 'required|string|max:255',
         ]);
 
         $category = Kategori::findOrFail($id);
@@ -91,14 +92,15 @@ class KategoriController extends Controller
     public function destroy(string $id)
     {
         $category = Kategori::findOrFail($id);
-        
+
         // Cek apakah kategori memiliki produk terkait
-        if($category->barang()->exists()) {
+        if ($category->barang()->exists()) {
             return redirect()->route('categories.index')
                 ->with('error', 'Kategori tidak dapat dihapus karena masih memiliki produk terkait');
         }
-        
+
         $category->delete();
+
         return redirect()->route('categories.index')
             ->with('success', 'Kategori berhasil dihapus');
     }

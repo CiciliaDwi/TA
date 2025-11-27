@@ -3,19 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use App\Http\Controllers\Controller;
+use App\Providers\RouteServiceProvider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use App\Providers\RouteServiceProvider;
 
 class UserController extends Controller
 {
     public function index()
     {
         $users = User::all();
+
         return view('user.listuser', compact('users'));
     }
+
     public function showLogin()
     {
         return view('auth.login');
@@ -30,7 +31,7 @@ class UserController extends Controller
             'alamat' => 'required',
             'jabatan' => 'required|in:admin,kasir',
             'gaji' => 'required|numeric',
-            'tglLahir' =>'required|date',
+            'tglLahir' => 'required|date',
         ]);
 
         $user = User::create([
@@ -46,11 +47,12 @@ class UserController extends Controller
         return redirect()->route('users.index')
             ->with('success', 'User berhasil ditambahkan');
     }
+
     public function login(Request $request)
     {
         $credentials = $request->validate([
             'username' => 'required',
-            'password' => 'required'
+            'password' => 'required',
         ]);
 
         if (Auth::attempt($credentials)) {
@@ -64,7 +66,7 @@ class UserController extends Controller
         }
 
         return back()->withErrors([
-            'username' => 'Username atau password salah!'
+            'username' => 'Username atau password salah!',
         ]);
     }
 
@@ -73,11 +75,14 @@ class UserController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+
         return redirect()->route('login');
     }
+
     public function edit($id)
     {
         $user = User::find($id);
+
         return view('user.edit', compact('user'));
     }
 
@@ -89,6 +94,7 @@ class UserController extends Controller
         return redirect()->route('users.index')
             ->with('success', 'Data user berhasil diperbarui');
     }
+
     public function destroy($id)
     {
         $user = User::find($id);

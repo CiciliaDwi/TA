@@ -20,11 +20,11 @@ return new class extends Migration
             $table->date('TanggalBayar');
             $table->float('Diskon');
             $table->timestamps();
-        
+
             $table->foreign('KodeSupplier')->references('KodeSupplier')->on('supplier');
             $table->foreign('id_pegawai')->references('id')->on('users');
         });
-        
+
     }
 
     /**

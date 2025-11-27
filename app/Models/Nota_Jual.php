@@ -10,29 +10,32 @@ class Nota_Jual extends Model
     use HasFactory;
 
     protected $table = 'nota_jual';
+
     protected $primaryKey = 'NoNota';
+
     public $incrementing = false;
+
     public $timestamps = false;
 
     const PAYMENT_METHODS = [
         'cash' => 'Tunai',
         'debit' => 'Debit',
-        'kredit' => 'Kredit'
+        'kredit' => 'Kredit',
     ];
 
     protected $fillable = [
         'NoNota',
         'Tanggal',
         'KodePelanggan',
-        'id_pegawai', 
-        'metode_pembayaran'
+        'id_pegawai',
+        'metode_pembayaran',
     ];
-    
 
     public function pegawai()
     {
         return $this->belongsTo(User::class, 'id_pegawai', 'id');
     }
+
     // public function pelanggan(){
     //     return $this->belongsTo(Pelanggan::class, 'KodePelanggan', 'KodePelanggan');
     // }

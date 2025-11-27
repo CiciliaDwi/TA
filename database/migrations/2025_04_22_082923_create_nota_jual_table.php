@@ -16,7 +16,7 @@ return new class extends Migration
             $table->timestamp('Tanggal');
             $table->integer('KodePelanggan')->unsigned();
             $table->integer('id')->unsigned();
-        
+
             $table->foreign('KodePelanggan')->references('KodePelanggan')->on('pelanggan');
             $table->foreign('id')->references('id')->on('users');
         });

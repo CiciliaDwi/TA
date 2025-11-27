@@ -19,10 +19,10 @@ return new class extends Migration
             $table->integer('Stok');
             $table->char('KodeKategori', 2);
             $table->timestamps();
-        
+
             $table->foreign('KodeKategori')->references('KodeKategori')->on('kategori');
         });
-        
+
     }
 
     /**

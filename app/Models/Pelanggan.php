@@ -10,16 +10,20 @@ class Pelanggan extends Model
     use HasFactory;
 
     protected $table = 'pelanggan';
+
     protected $primaryKey = 'KodePelanggan';
+
     public $incrementing = true;
+
     protected $keyType = 'int';
+
     public $timestamps = true;
-    
+
     protected $fillable = [
         'KodePelanggan',
         'Nama',
         'Alamat',
-        'Telepon'
+        'Telepon',
     ];
 
     public function nota_jual()

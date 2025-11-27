@@ -2,16 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\Barang;
 use App\Models\Nota_Jual;
 use App\Models\Nota_Jual_Detil;
 use App\Models\Pelanggan;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 
 class TransactionController extends Controller
 {
@@ -28,7 +25,6 @@ class TransactionController extends Controller
         return view('transaksi.transaction', compact('users', 'products', 'paymentMethods', 'customers'));
     }
 
-
     public function dashboard()
     {
         $recentTransactions = Nota_Jual::with(['pegawai', 'detil'])
@@ -39,14 +35,13 @@ class TransactionController extends Controller
         return view('home', compact('recentTransactions'));
     }
 
-
     public function getLastNotaNumber()
     {
         try {
             $today = now()->format('ymd');
-            $prefix = 'NJ' . $today;
+            $prefix = 'NJ'.$today;
 
-            $lastNota = Nota_Jual::where('NoNota', 'like', $prefix . '%')
+            $lastNota = Nota_Jual::where('NoNota', 'like', $prefix.'%')
                 ->orderBy('NoNota', 'desc')
                 ->first();
 
@@ -62,6 +57,7 @@ class TransactionController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+
     /**
      * Show the form for creating a new resource.
      */
@@ -82,11 +78,11 @@ class TransactionController extends Controller
             foreach ($request->products as $key => $product_id) {
                 $quantity = $request->quantities[$key];
                 $barang = Barang::find($product_id);
-                
-                if (!$barang) {
-                    throw new \Exception("Produk tidak ditemukan!");
+
+                if (! $barang) {
+                    throw new \Exception('Produk tidak ditemukan!');
                 }
-                
+
                 if ($barang->Stok < $quantity) {
                     throw new \Exception("Stok {$barang->NamaBarang} tidak mencukupi! Stok tersedia: {$barang->Stok}");
                 }
@@ -96,7 +92,7 @@ class TransactionController extends Controller
                 'NoNota' => $request->no_nota,
                 'Tanggal' => now(),
                 'id_pegawai' => $request->cashier_name,
-                'metode_pembayaran' => $request->payment_method
+                'metode_pembayaran' => $request->payment_method,
             ]);
 
             $grandTotal = 0;
@@ -112,7 +108,7 @@ class TransactionController extends Controller
                     'KodeBarang' => $product_id,
                     'Jumlah' => $quantity,
                     'Harga' => $price,
-                    'Total' => $subtotal
+                    'Total' => $subtotal,
                 ]);
 
                 $barang = Barang::find($product_id);
@@ -123,13 +119,15 @@ class TransactionController extends Controller
             $transaction->update(['total' => $grandTotal]);
 
             DB::commit();
+
             return redirect()->route('transactions.index')
                 ->with('success', 'Transaksi berhasil disimpan!');
 
         } catch (\Exception $e) {
             DB::rollback();
+
             return redirect()->route('transactions.index')
-                ->with('error', 'Transaksi gagal: ' . $e->getMessage());
+                ->with('error', 'Transaksi gagal: '.$e->getMessage());
         }
     }
 
@@ -139,6 +137,7 @@ class TransactionController extends Controller
     public function show(Nota_Jual $nota_Jual)
     {
         $nota_Jual->load(['detil.barang', 'pegawai']);
+
         return view('transaksi.transactions.show', compact('nota_Jual'));
     }
 

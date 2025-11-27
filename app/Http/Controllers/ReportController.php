@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\Barang;
 use App\Models\Nota_Jual;
 use App\Models\Nota_Jual_Detil;
@@ -22,14 +21,14 @@ class ReportController extends Controller
             DB::raw('SUM(nota_jual_detil.Jumlah) as TotalTerjual'),
             DB::raw('SUM(nota_jual_detil.Jumlah * nota_jual_detil.Harga) as TotalPendapatan')
         )
-        ->join('barang', 'barang.KodeBarang', '=', 'nota_jual_detil.KodeBarang')
-        ->join('nota_jual', 'nota_jual.NoNota', '=', 'nota_jual_detil.NoNota')
-        ->whereMonth('nota_jual.tanggal', date('m'))
-        ->whereYear('nota_jual.tanggal', date('Y'))
-        ->groupBy('barang.KodeBarang', 'barang.Nama')
-        ->orderBy('TotalTerjual', 'desc')
-        ->take(10)
-        ->get();
+            ->join('barang', 'barang.KodeBarang', '=', 'nota_jual_detil.KodeBarang')
+            ->join('nota_jual', 'nota_jual.NoNota', '=', 'nota_jual_detil.NoNota')
+            ->whereMonth('nota_jual.tanggal', date('m'))
+            ->whereYear('nota_jual.tanggal', date('Y'))
+            ->groupBy('barang.KodeBarang', 'barang.Nama')
+            ->orderBy('TotalTerjual', 'desc')
+            ->take(10)
+            ->get();
 
         // Stok menipis (< 10)
         $lowStock = Barang::with('kategori')

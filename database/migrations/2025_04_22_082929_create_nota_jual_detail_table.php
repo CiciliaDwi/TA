@@ -17,7 +17,7 @@ return new class extends Migration
             $table->integer('Harga');
             $table->integer('Jumlah');
             $table->timestamps();
-        
+
             $table->primary(['NoNota', 'KodeBarang']);
             $table->foreign('NoNota')->references('NoNota')->on('nota_jual');
             $table->foreign('KodeBarang')->references('KodeBarang')->on('barang');

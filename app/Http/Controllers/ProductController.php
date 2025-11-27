@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\Barang;
 use App\Models\Kategori;
 use Illuminate\Http\Request;
@@ -15,6 +14,7 @@ class ProductController extends Controller
     public function index()
     {
         $products = Barang::with('kategori')->get();
+
         return view('produk.listproduk', compact('products'));
     }
 
@@ -24,6 +24,7 @@ class ProductController extends Controller
     public function create()
     {
         $categories = Kategori::all();
+
         return view('produk.add', compact('categories'));
     }
 
@@ -38,7 +39,7 @@ class ProductController extends Controller
             'nama' => 'required|string|max:255',
             'harga_jual' => 'required|numeric|min:0',
             'stok' => 'required|integer|min:0',
-            'kategori' => 'required|exists:kategori,KodeKategori'
+            'kategori' => 'required|exists:kategori,KodeKategori',
         ], [
             'kode_barang.required' => 'Kode barang harus diisi',
             'kode_barang.unique' => 'Kode barang sudah digunakan',
@@ -55,10 +56,10 @@ class ProductController extends Controller
             'stok.integer' => 'Stok harus berupa angka bulat',
             'stok.min' => 'Stok tidak boleh negatif',
             'kategori.required' => 'Kategori harus dipilih',
-            'kategori.exists' => 'Kategori tidak valid'
+            'kategori.exists' => 'Kategori tidak valid',
         ]);
 
-        $product = new Barang();
+        $product = new Barang;
         $product->KodeBarang = $request->kode_barang;
         $product->Barcode = $request->barcode;
         $product->Nama = $request->nama;
@@ -86,6 +87,7 @@ class ProductController extends Controller
     {
         $product = Barang::findOrFail($id);
         $categories = Kategori::all();
+
         return view('produk.edit', compact('product', 'categories'));
     }
 
@@ -95,11 +97,11 @@ class ProductController extends Controller
     public function update(Request $request, string $id)
     {
         $request->validate([
-            'barcode' => 'required|string|digits_between:1,13|numeric|unique:barang,Barcode,' . $id . ',KodeBarang',
+            'barcode' => 'required|string|digits_between:1,13|numeric|unique:barang,Barcode,'.$id.',KodeBarang',
             'nama' => 'required|string|max:255',
             'harga_jual' => 'required|numeric|min:0',
             'stok' => 'required|integer|min:0',
-            'kategori' => 'required|exists:kategori,KodeKategori'
+            'kategori' => 'required|exists:kategori,KodeKategori',
         ], [
             'barcode.required' => 'Barcode harus diisi',
             'barcode.digits_between' => 'Barcode harus berupa 1-13 digit angka',
@@ -113,7 +115,7 @@ class ProductController extends Controller
             'stok.integer' => 'Stok harus berupa angka bulat',
             'stok.min' => 'Stok tidak boleh negatif',
             'kategori.required' => 'Kategori harus dipilih',
-            'kategori.exists' => 'Kategori tidak valid'
+            'kategori.exists' => 'Kategori tidak valid',
         ]);
 
         $product = Barang::findOrFail($id);

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('Alamat', 255);
             $table->timestamps();
         });
-        
+
     }
 
     /**
