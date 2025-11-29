@@ -33,7 +33,7 @@ class KategoriSeeder extends Seeder
 
         foreach ($categories as $i => $value) {
             Kategori::create([
-                'KodeKategori' => "C{$i}",
+                'KodeKategori' => "K-{$i}",
                 'Nama' => $value,
             ]);
         }
