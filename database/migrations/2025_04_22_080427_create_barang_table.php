@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('Nama', 45);
             $table->integer('HargaJual');
             $table->integer('Stok');
-            $table->char('KodeKategori', 2);
+            $table->char('KodeKategori', 5);
             $table->timestamps();
 
             $table->foreign('KodeKategori')->references('KodeKategori')->on('kategori');
