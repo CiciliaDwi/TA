@@ -168,7 +168,7 @@
             second: '2-digit',
             hour12: false
         };
-        document.getElementById('transaction_date').value = now.toLocaleString('id-ID', options);
+        document.getElementById('transaction_date')?.value = now.toLocaleString('id-ID', options);
     }
 
     // Update setiap detik
