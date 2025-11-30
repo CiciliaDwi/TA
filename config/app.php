@@ -212,4 +212,7 @@ return [
         // 'ExampleClass' => App\Example\ExampleClass::class,
     ])->toArray(),
 
+    'api' => [
+        'fuzzy_base_url' => env('FUZZY_APP_API'),
+    ],
 ];
