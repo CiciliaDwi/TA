@@ -90,8 +90,9 @@ class TransactionController extends Controller
 
             $transaction = Nota_Jual::create([
                 'NoNota' => $request->no_nota,
+                'KodePelanggan' => $request->customer_code,
                 'Tanggal' => now(),
-                'id_pegawai' => $request->cashier_name,
+                'id_pegawai' => $request->id_pegawai,
                 'metode_pembayaran' => $request->payment_method,
             ]);
 
