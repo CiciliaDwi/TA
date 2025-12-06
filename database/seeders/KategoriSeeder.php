@@ -12,29 +12,14 @@ class KategoriSeeder extends Seeder
      */
     public function run(): void
     {
-        $categories = [
-            'ACC',
-            'ANTI GORES HYDROGEL',
-            'Antigores Biasa',
-            'Antigores full',
-            'BATOK CHARGER',
-            'CHARGER MOBIL',
-            'HEADSET',
-            'HOLDER MOBIL',
-            'KABEL DATA',
-            'KARTU PERDANA',
-            'KARTU PERDANA INTERNET',
-            'KARTU PERDANA/ perdana',
-            'KARTU PERDANA/perdana',
-            'MEMORI EKSTERNAL/memori card',
-            'POWERBANK',
-            'RING STAND',
-        ];
+        $jsonPath = public_path('collection/category_collection.json');
+        $jsonString = file_get_contents($jsonPath);
+        $categories = json_decode($jsonString, true);
 
         foreach ($categories as $i => $value) {
             Kategori::create([
                 'KodeKategori' => "K-{$i}",
-                'Nama' => $value,
+                'Nama' => $value['Category Name'],
             ]);
         }
     }

@@ -23,10 +23,10 @@ class UserSeeder extends Seeder
         ]);
 
         User::query()->create([
-            'nama' => 'Kasir',
+            'nama' => fake('ID_id')->name,
             'tglLahir' => now()->subYears(25),
             'alamat' => fake()->address,
-            'gaji' => 5000000,
+            'gaji' => 3000000,
             'username' => 'kasir',
             'password' => 'Sandi123',
             'jabatan' => 'kasir',
