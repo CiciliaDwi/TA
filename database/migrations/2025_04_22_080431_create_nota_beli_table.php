@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('nota_beli', function (Blueprint $table) {
             $table->char('NoNota', 11)->primary();
             $table->timestamp('Tanggal');
-            $table->integer('KodeSupplier')->unsigned();
-            $table->integer('id_pegawai')->unsigned();
+            $table->unsignedBigInteger('KodeSupplier');
+            $table->unsignedBigInteger('id_pegawai');
             $table->date('TanggalJatuhTempo');
             $table->date('TanggalBayar');
             $table->float('Diskon');
