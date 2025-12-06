@@ -38,21 +38,20 @@ class TransactionController extends Controller
     public function getLastNotaNumber()
     {
         try {
-            $today = now()->format('ymd');
-            $prefix = 'NJ'.$today;
+            $prefix = 'NJ';
 
-            $lastNota = Nota_Jual::where('NoNota', 'like', $prefix.'%')
-                ->orderBy('NoNota', 'desc')
-                ->first();
+            $nextNumber = Nota_Jual::count() + 1;
 
-            if ($lastNota) {
-                $lastNumber = intval(substr($lastNota->NoNota, -3));
-                $nextNumber = $lastNumber + 1;
-            } else {
-                $nextNumber = 1;
-            }
+            $year = now()->format('y');
+            $month = now()->format('m');
+            $day = now()->format('d');
+            $sequence = str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
+            $notaNumber = $prefix.$year.$month.$day.$sequence; // ex: NJ250612003
 
-            return response()->json(['last_number' => $nextNumber]);
+            return response()->json([
+                'nota_number' => $notaNumber,
+            ]);
+
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
@@ -80,11 +79,17 @@ class TransactionController extends Controller
                 $barang = Barang::find($product_id);
 
                 if (! $barang) {
-                    throw new \Exception('Produk tidak ditemukan!');
+                    $message = 'Produk tidak ditemukan!';
+                    session()->flash('error', $message);
+
+                    return redirect()->back()->withInput($request->all());
                 }
 
                 if ($barang->Stok < $quantity) {
-                    throw new \Exception("Stok {$barang->NamaBarang} tidak mencukupi! Stok tersedia: {$barang->Stok}");
+                    $message = "Stok `{$barang->Nama}` tidak mencukupi! Stok tersedia: {$barang->Stok}";
+                    session()->flash('error', $message);
+
+                    return redirect()->back()->withInput($request->all());
                 }
             }
 
@@ -112,7 +117,7 @@ class TransactionController extends Controller
                     'Total' => $subtotal,
                 ]);
 
-                $barang = Barang::find($product_id);
+                $barang = Barang::lockForUpdate()->find($product_id);
                 $barang->Stok -= $quantity;
                 $barang->save();
             }

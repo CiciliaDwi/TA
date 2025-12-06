@@ -49,22 +49,12 @@
                 const response = await $.get('{{ route('get-last-nota-number') }}');
                 if (response.error) {
                     console.error('Error:', response.error);
-                    return '';
+                    return 'UNKNOWN ERROR';
                 }
-
-                let nextNumber = response.last_number;
-
-                let date = new Date();
-                let year = date.getFullYear().toString().substr(-2);
-                let month = (date.getMonth() + 1).toString().padStart(2, '0');
-                let day = date.getDate().toString().padStart(2, '0');
-
-                // Format nomor dengan padding 3 digit
-                let sequence = nextNumber.toString().padStart(3, '0');
-
-                let notaNumber = `NJ${year}${month}${day}${sequence}`;
-                console.log('Generated Nota Number:', notaNumber); // Untuk debugging
+                let notaNumber = response.nota_number;
+                // console.log('Generated Nota Number:', response); // Untuk debugging
                 return notaNumber;
+                return 'NULL'
             } catch (error) {
                 console.error('Error generating nota number:', error);
                 return '';
@@ -171,9 +161,11 @@
         };
 
         const transactionDate = document.getElementById('transaction_date')
-        
+
         if (transactionDate) {
-            transactionDate.value = now.toLocaleString('id-ID', options);
+            const localizeDate = now.toLocaleString('id-ID', options);
+            const parseDate = localizeDate.replaceAll('.', ':').replaceAll('pukul', '|');
+            transactionDate.value = parseDate
         }
     }
 
