@@ -33,7 +33,7 @@ class TransactionSeeder extends Seeder
                 Barang::inRandomOrder()->first()->KodeBarang => fake()->numberBetween(1, 5),
                 Barang::inRandomOrder()->first()->KodeBarang => fake()->numberBetween(1, 5),
                 Barang::inRandomOrder()->first()->KodeBarang => fake()->numberBetween(1, 5),
-                Barang::inRandomOrder()->first()->KodeBarang => fake()->numberBetween(1, 5)
+                Barang::inRandomOrder()->first()->KodeBarang => fake()->numberBetween(1, 5),
             ];
 
             $grandTotal = 0;

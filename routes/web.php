@@ -59,4 +59,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/prediction', [PredictionController::class, 'showForm'])->name('prediction.form');
     Route::post('/prediction', [PredictionController::class, 'predict'])->name('prediction.process');
     Route::post('/prediction/task', [PredictionController::class, 'getTaskInfo'])->name('prediction.task');
+    Route::post('/prediction/save-result', [PredictionController::class, 'savePrediction'])->name('prediction.save-result');
 });
+
+Route::get('/omzet', [PredictionController::class, 'getOmzetPerItem']);

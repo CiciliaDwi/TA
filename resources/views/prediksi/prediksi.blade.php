@@ -52,8 +52,9 @@
                                 @csrf
                                 <div class="mb-3">
                                     <label for="product_code" class="form-label">Produk</label>
-                                    <select class="form-control product-select @error('product_code') is-invalid @enderror" id="product_code"
-                                        name="product_code" required>
+                                    <select
+                                        class="form-control product-select @error('product_code') is-invalid @enderror"
+                                        id="product_code" name="product_code" required>
                                         <option value="">Pilih Produk</option>
                                         @foreach ($products as $product)
                                             <option value="{{ $product->KodeBarang }}"
@@ -112,6 +113,46 @@
     <script>
         let taskInterval = null;
 
+        // ====== Save Response Data Prediction ======
+        function saveResponsePrediction(response) {
+            $.ajax({
+                url: "{{ route('prediction.save-result') }}",
+                method: "POST",
+                data: {
+                    response
+                },
+                headers: {
+                    "X-CSRF-TOKEN": '{{ csrf_token() }}'
+                },
+                success: function(res) {
+                    if (res.success) {
+                        const message = response.message;
+                        const resultQty = response.result.result_qty;
+
+                        $("#loading").html(
+                            `<div class="alert alert-success">${message}</div>`
+                        );
+
+                        $("#resultData").removeClass('d-none');
+                        $("#resultQty").html(resultQty);
+
+                        // $("#predictForm")[0].reset(); // reset form
+
+                        clearInterval(taskInterval); // stop loop checking
+                        return;
+                    }
+                },
+                error: function() {
+                    clearInterval(taskInterval);
+                    $('#buttonSubmit').removeClass('disabled');
+
+                    $("#loading").html(
+                        `<div class="alert alert-danger">Terjadi kesalahan saat proses prediksi.</div>`
+                    );
+                },
+            })
+        }
+
         // ====== Cek status background task ======
         function checkTaskStatus(taskId) {
             $.ajax({
@@ -128,18 +169,7 @@
                         const message = response.message;
 
                         if (response.status === "DONE") {
-                            const resultQty = response.result.result_qty;
-
-                            $("#loading").html(
-                                `<div class="alert alert-success">${message}</div>`
-                            );
-
-                            $("#resultData").removeClass('d-none');
-                            $("#resultQty").html(resultQty);
-
-                            // $("#predictForm")[0].reset(); // reset form
-
-                            clearInterval(taskInterval); // stop loop checking
+                            saveResponsePrediction(response);
                         } else {
                             $("#loading").html(`${message}        
                               <div class="spinner-border" role="status">

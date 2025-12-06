@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Barang;
-use App\Models\Kategori;
 use App\Models\Nota_Jual_Detil;
 use App\Models\Prediction;
 use Illuminate\Http\Client\PendingRequest;
@@ -11,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
 
 class PredictionController extends Controller
 {
@@ -65,7 +65,7 @@ class PredictionController extends Controller
             $response = $this->client->get($path);
             $result = $response->json();
 
-            Log::channel('PREDICTION')->debug('Task Completed', $result);
+            Log::debug('Task Completed', $result);
 
             return $result;
 
@@ -107,14 +107,33 @@ class PredictionController extends Controller
     public function savePrediction(Request $request)
     {
         $validatedData = $request->validate([
-            'result_qty' => ['required'],
-            'category_code' => ['required'],
+            'response' => ['required'],
+            'response.status' => ['required', Rule::in(['DONE', 'RUNNING'])],
+            'response.result' => ['required'],
         ]);
 
-        Prediction::create($validatedData);
+        try {
 
-        return response()->json([
-            'success' => true,
-        ]);
+            $response = $validatedData['response'];
+
+            $data['user_id'] = auth('web')->id();
+            $data['product_id'] = $response['result']['product_code'];
+            $data['result_qty'] = $response['result']['result_qty'];
+            $data['response_payload'] = json_encode($response);
+
+            Prediction::create($data);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Prediction berhasil disimpan',
+            ]);
+        } catch (\Throwable $th) {
+            Log::error('savePrediction', ['event' => 'savePrediction', 'error' => $th->getMessage()]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Prediction gagal disimpan',
+            ], 500);
+        }
     }
 }

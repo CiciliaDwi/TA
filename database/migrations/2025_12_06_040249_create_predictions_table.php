@@ -14,11 +14,12 @@ return new class extends Migration
         Schema::create('predictions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users');
-            $table->string('category_code');
+            $table->string('product_id');
             $table->integer('result_qty');
+            $table->json('response_payload');
             $table->timestamps();
 
-            $table->foreign('category_code')->references('KodeKategori')->on('kategori');
+            $table->foreign('product_id')->references('KodeBarang')->on('barang');
         });
     }
 
