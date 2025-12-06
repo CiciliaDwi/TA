@@ -20,7 +20,7 @@ class TransactionController extends Controller
         $users = User::all();
         $products = Barang::where('Stok', '>', 0)->get();
         $customers = Pelanggan::all();
-        $paymentMethods = ['cash', 'debit', 'kredit'];
+        $paymentMethods = ['Cash', 'Debit', 'Kredit'];
 
         return view('transaksi.transaction', compact('users', 'products', 'paymentMethods', 'customers'));
     }
@@ -122,7 +122,7 @@ class TransactionController extends Controller
                 $barang->save();
             }
 
-            $transaction->update(['total' => $grandTotal]);
+            // $transaction->update(['total' => $grandTotal]);
 
             DB::commit();
 

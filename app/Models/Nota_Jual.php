@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -49,5 +50,12 @@ class Nota_Jual extends Model
         return $this->belongsToMany(Barang::class, 'nota_jual_detil', 'NoNota', 'KodeBarang')
             ->withPivot(['Harga', 'Jumlah'])
             ->using(Nota_Jual_Detil::class);
+    }
+
+    protected function total(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->detil()->sum('Total')
+        );
     }
 }
