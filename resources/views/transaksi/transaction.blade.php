@@ -23,7 +23,7 @@
                             Form Transaksi Penjualan
                         </div>
                         <div class="card-body">
-                            @if(session('success'))
+                            @if (session('success'))
                                 <div class="alert alert-success alert-dismissible fade show" role="alert">
                                     {{ session('success') }}
                                     <button type="button" class="btn-close" data-bs-dismiss="alert"
@@ -31,7 +31,7 @@
                                 </div>
                             @endif
 
-                            @if(session('error'))
+                            @if (session('error'))
                                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
                                     {{ session('error') }}
                                     <button type="button" class="btn-close" data-bs-dismiss="alert"
@@ -61,10 +61,12 @@
                                         </div>
                                         <div class="form-group mb-3">
                                             <label for="customer_code">Nama Pelanggan</label>
-                                            <select class="form-control" id="customer_code" name="customer_code" required>
+                                            <select class="form-control" id="customer_code" name="customer_code"
+                                                required>
                                                 <option value="">Pilih Pelanggan</option>
-                                                @foreach($customers as $customer)
-                                                    <option value="{{ $customer->KodePelanggan }}">
+                                                @foreach ($customers as $customer)
+                                                    <option value="{{ $customer->KodePelanggan }}"
+                                                        @selected(old('customer_code') == $customer->KodePelanggan)>
                                                         {{ $customer->Nama }}
                                                     </option>
                                                 @endforeach
@@ -75,8 +77,8 @@
                                             <select class="form-control" id="payment_method" name="payment_method"
                                                 required>
                                                 <option value="">Pilih Metode Pembayaran</option>
-                                                @foreach($paymentMethods as $method)
-                                                    <option value="{{ $method }}">
+                                                @foreach ($paymentMethods as $method)
+                                                    <option value="{{ $method }}" @selected(old('payment_method') == $method)>
                                                         {{ ucfirst($method) }}
                                                     </option>
                                                 @endforeach
@@ -111,7 +113,7 @@
                                                             <select class="form-control product-select select2"
                                                                 name="products[]" required>
                                                                 <option value="">Pilih Produk</option>
-                                                                @foreach($products as $product)
+                                                                @foreach ($products as $product)
                                                                     <option value="{{ $product->KodeBarang }}"
                                                                         data-price="{{ $product->HargaJual }}"
                                                                         data-barcode="{{ $product->Barcode }}">
