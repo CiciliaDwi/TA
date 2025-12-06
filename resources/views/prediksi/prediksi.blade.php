@@ -206,9 +206,10 @@
 
                 },
                 error: function(xhr) {
+                    console.error(xhr.responseJSON?.message)
                     $('#buttonSubmit').removeClass('disabled');
                     $("#loading").html(
-                        `<div class="alert alert-danger">${xhr.responseJSON?.message ?? "Error terjadi"}</div>`
+                        `<div class="alert alert-danger">${"Terjadi kesalahan pada server"}</div>`
                     );
                 }
             });

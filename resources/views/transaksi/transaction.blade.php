@@ -54,14 +54,14 @@
                                             <input type="hidden" name="transaction_date" value="{{ now() }}">
                                         </div>
                                         <div class="form-group mb-3">
-                                            <label for="cashier_name">Nama Kasir</label>
-                                            <input type="text" class="form-control" id="cashier_name"
+                                            <label for="id_pegawai">Nama Kasir</label>
+                                            <input type="text" class="form-control" id="id_pegawai"
                                                 value="{{ Auth::user()->nama }}" readonly>
-                                            <input type="hidden" name="cashier_name" value="{{ Auth::user()->id }}">
+                                            <input type="hidden" name="id_pegawai" value="{{ Auth::user()->id }}">
                                         </div>
                                         <div class="form-group mb-3">
-                                            <label for="customer_code">Nama Pelanggan (Opsional)</label>
-                                            <select class="form-control" id="customer_code" name="customer_code">
+                                            <label for="customer_code">Nama Pelanggan</label>
+                                            <select class="form-control" id="customer_code" name="customer_code" required>
                                                 <option value="">Pilih Pelanggan</option>
                                                 @foreach($customers as $customer)
                                                     <option value="{{ $customer->KodePelanggan }}">

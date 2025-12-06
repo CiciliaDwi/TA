@@ -1,6 +1,6 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
-    crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous">
+</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js"
     crossorigin="anonymous"></script>
@@ -8,7 +8,7 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <script>
-    $(document).ready(function () {
+    $(document).ready(function() {
         // Fungsi untuk inisialisasi Select2
         function initializeSelect2() {
             $('.product-select').select2({
@@ -20,7 +20,7 @@
 
         initializeSelect2();
 
-        $('#add_product').off('click').on('click', function () {
+        $('#add_product').off('click').on('click', function() {
             const tbody = $('#products_table tbody');
             const originalRow = tbody.find('tr:first');
 
@@ -43,10 +43,10 @@
             initializeSelect2();
         });
     });
-    $(document).ready(function () {
+    $(document).ready(function() {
         async function generateNoNota() {
             try {
-                const response = await $.get('{{ route("get-last-nota-number") }}');
+                const response = await $.get('{{ route('get-last-nota-number') }}');
                 if (response.error) {
                     console.error('Error:', response.error);
                     return '';
@@ -88,14 +88,14 @@
         // Fungsi untuk menghitung total
         function calculateTotal() {
             let total = 0;
-            $('.product-subtotal').each(function () {
+            $('.product-subtotal').each(function() {
                 total += parseFloat($(this).val()) || 0;
             });
             $('#total_amount').val(total);
         }
 
         // Event ketika produk dipilih
-        $(document).on('change', '.product-select', function () {
+        $(document).on('change', '.product-select', function() {
             const row = $(this).closest('tr');
             const selectedOption = $(this).find(':selected');
 
@@ -117,13 +117,13 @@
         });
 
         // Event ketika jumlah diubah
-        $(document).on('change', '.product-quantity', function () {
+        $(document).on('change', '.product-quantity', function() {
             const row = $(this).closest('tr');
             calculateSubtotal(row);
         });
 
         // Hapus baris produk
-        $(document).on('click', '.remove-product', function () {
+        $(document).on('click', '.remove-product', function() {
             if ($('#products_table tbody tr').length > 1) {
                 $(this).closest('tr').remove();
                 calculateTotal();
@@ -131,7 +131,7 @@
         });
 
         // Tambahkan tombol untuk reset form dan generate nomor nota baru
-        $('#reset-form').on('click', function () {
+        $('#reset-form').on('click', function() {
             // Reset form
             $('form')[0].reset();
 
@@ -156,6 +156,7 @@
             $('#total_amount').val('0');
         });
     });
+
     function updateDateTime() {
         var now = new Date();
         var options = {
@@ -168,7 +169,12 @@
             second: '2-digit',
             hour12: false
         };
-        document.getElementById('transaction_date')?.value = now.toLocaleString('id-ID', options);
+
+        const transactionDate = document.getElementById('transaction_date')
+        
+        if (transactionDate) {
+            transactionDate.value = now.toLocaleString('id-ID', options);
+        }
     }
 
     // Update setiap detik
