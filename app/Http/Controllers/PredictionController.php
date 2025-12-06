@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\UploadDatasetJob;
 use App\Models\Barang;
-use App\Models\Nota_Jual_Detil;
 use App\Models\Prediction;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Request;
@@ -74,36 +74,6 @@ class PredictionController extends Controller
         }
     }
 
-    public function getOmzetPerItem()
-    {
-        $currentMonth = now()->month;
-        $date = Carbon::createFromDate(now()->year, $currentMonth)->format('M Y');
-
-        $details = Nota_Jual_Detil::query()
-            ->with('barang.kategori')
-            ->whereMonth('created_at', $currentMonth)
-            ->get();
-
-        $data = $details
-            ->groupBy(fn ($item) => $item->barang->KodeBarang)
-            ->map(fn ($group, $key) => [
-                'code' => $key,
-                'product_name' => $group->first()->barang->Nama,
-                'category_name' => $group->first()->barang->kategori->Nama,
-                'merk' => $group->first()->barang->Merek,
-                'qty' => $group->sum('Jumlah'),
-                'omzet' => $group->sum('Total'),
-                'date' => $date,
-            ])
-            ->values();
-
-        return response()->json([
-            'success' => true,
-            'message' => "Omzet per barang berhasil diambil ($date)",
-            'data' => $data,
-        ]);
-    }
-
     public function savePrediction(Request $request)
     {
         $validatedData = $request->validate([
@@ -133,6 +103,31 @@ class PredictionController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Prediction gagal disimpan',
+            ], 500);
+        }
+    }
+
+    public function uploadDataset()
+    {
+        $currentMonth = now()->month;
+        $date = Carbon::createFromDate(now()->year, $currentMonth)->format('M Y');
+
+        try {
+            UploadDatasetJob::dispatch($currentMonth);
+            Log::debug("Dataset period $date upload in background process...");
+
+            return response()->json([
+                'success' => true,
+                'message' => "Dataset period $date upload in background process",
+            ]);
+
+        } catch (\Throwable $th) {
+            Log::error("Dataset period $date gagal diupload", ['error' => $th->getMessage()]);
+            throw $th;
+
+            return response()->json([
+                'success' => false,
+                'message' => "Dataset period $date gagal diupload",
             ], 500);
         }
     }
