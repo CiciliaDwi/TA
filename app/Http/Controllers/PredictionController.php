@@ -2,10 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Barang;
 use App\Models\Kategori;
+use App\Models\Nota_Jual_Detil;
+use App\Models\Prediction;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class PredictionController extends Controller
 {
@@ -18,15 +23,9 @@ class PredictionController extends Controller
 
     public function showForm()
     {
-        $categories = Kategori::all();
-        // Mengirim data hasil prediksi null ke view pada awalnya
-        // return view('prediksi.prediksi', [
-        //     'prediction_result' => null,
-        //     // Memberikan URL API Python ke View untuk panduan
-        //     'pythonApiUrl' => 'http://localhost:5000/predict',
-        // ]);
+        $products = Barang::select(['KodeBarang', 'Nama'])->get();
 
-        return view('prediksi.prediksi', compact('categories'));
+        return view('prediksi.prediksi', compact('products'));
     }
 
     /**
@@ -37,8 +36,10 @@ class PredictionController extends Controller
         $path = '/predict';
         $validatedData = $request->validate([
             'qty' => 'required|numeric|min:0',
-            'category' => 'required',
+            'product_code' => 'required',
         ]);
+
+        $validatedData['product_name'] = Barang::find($validatedData['product_code'])?->Nama ?? 'Unknown';
 
         try {
             $response = $this->client->post($path, $validatedData);
@@ -62,67 +63,58 @@ class PredictionController extends Controller
 
         try {
             $response = $this->client->get($path);
+            $result = $response->json();
 
-            return $response->json();
+            Log::channel('PREDICTION')->debug('Task Completed', $result);
+
+            return $result;
 
         } catch (\Throwable $th) {
             throw $th;
         }
     }
 
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function getOmzetPerItem()
     {
-        //
+        $currentMonth = now()->month;
+        $date = Carbon::createFromDate(now()->year, $currentMonth)->format('M Y');
+
+        $details = Nota_Jual_Detil::query()
+            ->with('barang.kategori')
+            ->whereMonth('created_at', $currentMonth)
+            ->get();
+
+        $data = $details
+            ->groupBy(fn ($item) => $item->barang->KodeBarang)
+            ->map(fn ($group, $key) => [
+                'code' => $key,
+                'product_name' => $group->first()->barang->Nama,
+                'category_name' => $group->first()->barang->kategori->Nama,
+                'merk' => $group->first()->barang->Merek,
+                'qty' => $group->sum('Jumlah'),
+                'omzet' => $group->sum('Total'),
+                'date' => $date,
+            ])
+            ->values();
+
+        return response()->json([
+            'success' => true,
+            'message' => "Omzet per barang berhasil diambil ($date)",
+            'data' => $data,
+        ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function savePrediction(Request $request)
     {
-        //
-    }
+        $validatedData = $request->validate([
+            'result_qty' => ['required'],
+            'category_code' => ['required'],
+        ]);
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+        Prediction::create($validatedData);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return response()->json([
+            'success' => true,
+        ]);
     }
 }

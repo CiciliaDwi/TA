@@ -51,14 +51,14 @@
                             <form id="predictForm">
                                 @csrf
                                 <div class="mb-3">
-                                    <label for="category" class="form-label">Kategori</label>
-                                    <select class="form-control @error('category') is-invalid @enderror" id="category"
-                                        name="category" required>
-                                        <option value="">Pilih Kategori</option>
-                                        @foreach ($categories as $category)
-                                            <option value="{{ $category->KodeKategori }}"
-                                                {{ old('category') == $category->KodeKategori ? 'selected' : '' }}>
-                                                {{ $category->Nama }}
+                                    <label for="product_code" class="form-label">Produk</label>
+                                    <select class="form-control product-select @error('product_code') is-invalid @enderror" id="product_code"
+                                        name="product_code" required>
+                                        <option value="">Pilih Produk</option>
+                                        @foreach ($products as $product)
+                                            <option value="{{ $product->KodeBarang }}"
+                                                {{ old('product_code') == $product->KodeBarang ? 'selected' : '' }}>
+                                                {{ $product->Nama }}
                                             </option>
                                         @endforeach
                                     </select>
