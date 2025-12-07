@@ -18,18 +18,20 @@
                         <li class="breadcrumb-item active">Daftar Kategori</li>
                     </ol>
 
-                    @if(session('success'))
-                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        {{ session('success') }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
+                    @if (session('success'))
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            {{ session('success') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                aria-label="Close"></button>
+                        </div>
                     @endif
 
-                    @if(session('error'))
-                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                        {{ session('error') }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
+                    @if (session('error'))
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            {{ session('error') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                aria-label="Close"></button>
+                        </div>
                     @endif
 
                     <div class="card mb-4">
@@ -47,7 +49,7 @@
                             </div>
                         </div>
                         <div class="card-body">
-                            <table id="datatablesSimple" class="table table-bordered">
+                            <table class="table table-bordered datatable">
                                 <thead>
                                     <tr>
                                         <th>Kode Kategori</th>
@@ -58,28 +60,29 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach($categories as $category)
-                                    <tr>
-                                        <td>{{ $category->KodeKategori }}</td>
-                                        <td>{{ $category->Nama }}</td>
-                                        <td>{{ $category->created_at }}</td>
-                                        <td>{{ $category->updated_at }}</td>
-                                        <td>
-                                            <a href="{{ route('categories.edit', $category->KodeKategori) }}" 
-                                               class="btn btn-warning btn-sm">
-                                                <i class="fas fa-edit"></i> Edit
-                                            </a>
-                                            <form action="{{ route('categories.destroy', $category->KodeKategori) }}" 
-                                                  method="POST" class="d-inline" 
-                                                  onsubmit="return confirm('Apakah Anda yakin ingin menghapus kategori : {{$category->Nama}} ?')">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-danger btn-sm">
-                                                    <i class="fas fa-trash"></i> Hapus
-                                                </button>
-                                            </form>
-                                        </td>
-                                    </tr>
+                                    @foreach ($categories as $category)
+                                        <tr>
+                                            <td>{{ $category->KodeKategori }}</td>
+                                            <td>{{ $category->Nama }}</td>
+                                            <td>{{ $category->created_at }}</td>
+                                            <td>{{ $category->updated_at }}</td>
+                                            <td>
+                                                <a href="{{ route('categories.edit', $category->KodeKategori) }}"
+                                                    class="btn btn-warning btn-sm">
+                                                    <i class="fas fa-edit"></i> Edit
+                                                </a>
+                                                <form
+                                                    action="{{ route('categories.destroy', $category->KodeKategori) }}"
+                                                    method="POST" class="d-inline"
+                                                    onsubmit="return confirm('Apakah Anda yakin ingin menghapus kategori : {{ $category->Nama }} ?')">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-danger btn-sm">
+                                                        <i class="fas fa-trash"></i> Hapus
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
                                     @endforeach
                                 </tbody>
                             </table>
@@ -92,4 +95,5 @@
     </div>
     @include('include.script')
 </body>
+
 </html>

@@ -52,7 +52,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/categories', [KategoriController::class, 'index'])->name('categories.index');
 
     // report
-    Route::get('/laporan', [ReportController::class, 'index'])->name('laporan.index');
+    Route::get('/reports', [ReportController::class, 'index'])->name('laporan.index');
 
     // prediksi
     // Route::get('/prediksi', [ReportController::class, 'index'])->name('laporan.index');

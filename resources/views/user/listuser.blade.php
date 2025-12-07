@@ -18,10 +18,11 @@
                         <li class="breadcrumb-item active">Daftar User</li>
                     </ol>
 
-                    @if(session('success'))
+                    @if (session('success'))
                         <div class="alert alert-success alert-dismissible fade show" role="alert">
                             {{ session('success') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                aria-label="Close"></button>
                         </div>
                     @endif
 
@@ -41,7 +42,7 @@
                             </div>
                         </div>
                         <div class="card-body">
-                            <table id="datatablesSimple">
+                            <table class="datatable">
                                 <thead>
                                     <tr>
                                         <th>ID</th>
@@ -54,10 +55,10 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach($users as $user)
+                                    @foreach ($users as $user)
                                         <tr>
                                             <td>{{ $user->id }}</td>
-                                            <td>{{ $user->nama}}</td>
+                                            <td>{{ $user->nama }}</td>
                                             <td>{{ $user->alamat }}</td>
                                             <td>{{ $user->tglLahir }}</td>
                                             <td>{{ $user->jabatan }}</td>
@@ -72,7 +73,7 @@
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="btn btn-danger btn-sm"
-                                                        onclick="return confirm('Apakah Anda yakin ingin menghapus user {{$user->nama}} ? Data yang dihapus tidak dapat dikembalikan.')">
+                                                        onclick="return confirm('Apakah Anda yakin ingin menghapus user {{ $user->nama }} ? Data yang dihapus tidak dapat dikembalikan.')">
                                                         <i class="fas fa-trash"></i>Hapus
                                                     </button>
                                                 </form>

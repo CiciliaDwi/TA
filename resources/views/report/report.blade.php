@@ -35,7 +35,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach($bestSellers as $product)
+                                    @foreach ($bestSellers as $product)
                                         <tr>
                                             <td>{{ $product->KodeBarang }}</td>
                                             <td>{{ $product->NamaBarang }}</td>
@@ -48,13 +48,13 @@
                         </div>
                     </div>
 
-                    <!-- Stok <10 -->   
+                    <!-- Stok <10 -->
                     <div class="card mb-4">
                         <div class="card-header">
                             <i class="fas fa-exclamation-triangle me-1"></i>
                             Produk dengan Stok Menipis (< 10) </div>
                                 <div class="card-body">
-                                    <table class="table table-bordered">
+                                    <table class="table table-bordered datatable">
                                         <thead>
                                             <tr>
                                                 <th>Kode</th>
@@ -64,7 +64,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach($lowStock as $product)
+                                            @foreach ($lowStock as $product)
                                                 <tr>
                                                     <td>{{ $product->KodeBarang }}</td>
                                                     <td>{{ $product->Nama }}</td>
@@ -84,7 +84,7 @@
                                 Semua Transaksi
                             </div>
                             <div class="card-body">
-                                <table id="datatablesSimple" class="table table-bordered">
+                                <table class="table table-bordered datatable">
                                     <thead>
                                         <tr>
                                             <th>No Nota</th>
@@ -95,17 +95,23 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach($allSales as $sale)
-                                                                                <tr>
-                                                                                    <td>{{ $sale->NoNota }}</td>
-                                                                                    <td>{{ date('d/m/Y H:i', strtotime($sale->Tanggal)) }}</td>
-                                                                                    <td>{{ $sale->pegawai->nama }}</td>
-                                                                                    <td>{{ $sale->detil->sum('Jumlah') }}</td>
-                                                                                    <td>Rp {{ number_format($sale->detil->sum(function ($item) {
-                                                                                        return $item->Jumlah * $item->Harga;
-                                                                                        }), 0, ',', '.') }}
-                                                                                    </td>
-                                                                                </tr>
+                                        @foreach ($allSales as $sale)
+                                            <tr>
+                                                <td>{{ $sale->NoNota }}</td>
+                                                <td>{{ date('d/m/Y H:i', strtotime($sale->Tanggal)) }}</td>
+                                                <td>{{ $sale->pegawai->nama }}</td>
+                                                <td>{{ $sale->detil->sum('Jumlah') }}</td>
+                                                <td>Rp
+                                                    {{ number_format(
+                                                        $sale->detil->sum(function ($item) {
+                                                            return $item->Jumlah * $item->Harga;
+                                                        }),
+                                                        0,
+                                                        ',',
+                                                        '.',
+                                                    ) }}
+                                                </td>
+                                            </tr>
                                         @endforeach
                                     </tbody>
                                 </table>

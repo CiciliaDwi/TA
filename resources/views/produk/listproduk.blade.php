@@ -18,11 +18,12 @@
                         <li class="breadcrumb-item active">Daftar Produk</li>
                     </ol>
 
-                    @if(session('success'))
-                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        {{ session('success') }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
+                    @if (session('success'))
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            {{ session('success') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                aria-label="Close"></button>
+                        </div>
                     @endif
 
                     <div class="card mb-4">
@@ -40,7 +41,7 @@
                             </div>
                         </div>
                         <div class="card-body">
-                            <table id="datatablesSimple" class="table table-bordered">
+                            <table class="table table-bordered datatable">
                                 <thead>
                                     <tr>
                                         <th>Kode Barang</th>
@@ -53,30 +54,30 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach($products as $product)
-                                    <tr>
-                                        <td>{{ $product->KodeBarang }}</td>
-                                        <td>{{ $product->Barcode }}</td>
-                                        <td>{{ $product->Nama }}</td>
-                                        <td>Rp {{ number_format($product->HargaJual, 0, ',', '.') }}</td>
-                                        <td>{{ $product->Stok }}</td>
-                                        <td>{{ $product->kategori->Nama }}</td>
-                                        <td>
-                                            <a href="{{ route('products.edit', $product->KodeBarang) }}" 
-                                               class="btn btn-warning btn-sm">
-                                                <i class="fas fa-edit"></i> Edit
-                                            </a>
-                                            <form action="{{ route('products.destroy', $product->KodeBarang) }}" 
-                                                  method="POST" class="d-inline" 
-                                                  onsubmit="return confirm('Apakah Anda yakin ingin menghapus produk: {{$product->Nama}}?')">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-danger btn-sm">
-                                                    <i class="fas fa-trash"></i> Hapus
-                                                </button>
-                                            </form>
-                                        </td>
-                                    </tr>
+                                    @foreach ($products as $product)
+                                        <tr>
+                                            <td>{{ $product->KodeBarang }}</td>
+                                            <td>{{ $product->Barcode }}</td>
+                                            <td>{{ $product->Nama }}</td>
+                                            <td>Rp {{ number_format($product->HargaJual, 0, ',', '.') }}</td>
+                                            <td>{{ $product->Stok }}</td>
+                                            <td>{{ $product->kategori->Nama }}</td>
+                                            <td>
+                                                <a href="{{ route('products.edit', $product->KodeBarang) }}"
+                                                    class="btn btn-warning btn-sm">
+                                                    <i class="fas fa-edit"></i> Edit
+                                                </a>
+                                                <form action="{{ route('products.destroy', $product->KodeBarang) }}"
+                                                    method="POST" class="d-inline"
+                                                    onsubmit="return confirm('Apakah Anda yakin ingin menghapus produk: {{ $product->Nama }}?')">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-danger btn-sm">
+                                                        <i class="fas fa-trash"></i> Hapus
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
                                     @endforeach
                                 </tbody>
                             </table>

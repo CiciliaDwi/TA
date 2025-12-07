@@ -173,39 +173,4 @@
     setInterval(updateDateTime, 1000);
     // Jalankan sekali saat halaman dimuat
     updateDateTime();
-
-    function calculateMonthlyIncome(selectedMonth) {
-        // Mengambil semua transaksi dari tabel
-        const table = document.getElementById('datatablesSimple');
-        const rows = table.getElementsByTagName('tr');
-        let totalIncome = 0;
-
-        // Mengubah format bulan yang dipilih menjadi format yang sesuai untuk perbandingan
-        const selectedDate = new Date(selectedMonth);
-        const selectedYear = selectedDate.getFullYear();
-        const selectedMonthIndex = selectedDate.getMonth();
-
-        // Loop melalui setiap baris transaksi
-        for (let i = 1; i < rows.length; i++) { // Mulai dari 1 untuk melewati header
-            const dateCell = rows[i].cells[1].innerText; // Mengambil kolom tanggal
-            const amountText = rows[i].cells[4].innerText; // Mengambil kolom total harga
-
-            // Mengubah format tanggal transaksi
-            const [day, month, yearTime] = dateCell.split('/');
-            const [year, time] = yearTime.split(' ');
-            const transactionDate = new Date(year, month - 1, day);
-
-            // Cek apakah transaksi ada di bulan yang dipilih
-            if (transactionDate.getFullYear() === selectedYear &&
-                transactionDate.getMonth() === selectedMonthIndex) {
-                // Mengubah format harga dari "Rp XX.XXX" menjadi angka
-                const amount = parseInt(amountText.replace(/[^0-9]/g, ''));
-                totalIncome += amount;
-            }
-        }
-
-        // Memperbarui tampilan total pendapatan
-        document.getElementById('monthlyIncome').innerHTML =
-            'Rp ' + totalIncome.toLocaleString('id-ID');
-    }
 </script>
