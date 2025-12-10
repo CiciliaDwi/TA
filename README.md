@@ -7,6 +7,59 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
+## Getting Started
+
+### Prerequisites
+- PHP ^8.1
+- Composer (PHP package manager)
+
+### Installation
+
+#### Step 1: Clone the Repository
+Clone the repository to your local machine.
+
+#### Step 2: Install Dependencies
+Run the following command to install the necessary dependencies:
+```bash
+composer install
+```
+
+#### Step 3: Set Up Environment File
+Copy the example environment file:
+```bash
+cp .env.example .env
+```
+
+#### Step 4: Generate Application Key
+Run the command to generate the application key:
+```bash
+php artisan key:generate
+```
+
+#### Step 5: Configure Database
+Edit the `.env` file to configure your database settings.
+
+#### Step 6: Run Migrations
+Execute the following command to run the database migrations:
+```bash
+php artisan migrate
+```
+#### Step 7: Run Seeder
+Execute the following command to run the database seeders:
+```bash
+php artisan db:seed
+
+# or after running first time migration
+php artisan migrate:fresh --seed
+```
+
+### Running the App
+To start the application, execute the following command:
+```bash
+php artisan serve
+```
+The application will be available at `http://localhost:8000`
+
 ## About Laravel
 
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
