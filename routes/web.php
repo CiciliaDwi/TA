@@ -53,6 +53,8 @@ Route::middleware('auth')->group(function () {
 
     // report
     Route::get('/reports', [ReportController::class, 'index'])->name('laporan.index');
+    Route::post('/reports/trigger/download', [ReportController::class, 'triggerDownloadReport'])->name('report.trigger.download');
+    Route::get('/reports/pooling/download/{taskId}/{taskCategory}', [ReportController::class, 'downloadReport'])->name('report.pooling.download');
 
     // prediksi
     // Route::get('/prediksi', [ReportController::class, 'index'])->name('laporan.index');
@@ -60,8 +62,5 @@ Route::middleware('auth')->group(function () {
     Route::post('/prediction', [PredictionController::class, 'predict'])->name('prediction.process');
     Route::post('/prediction/task', [PredictionController::class, 'getTaskInfo'])->name('prediction.task');
     Route::post('/prediction/save-result', [PredictionController::class, 'savePrediction'])->name('prediction.save-result');
-    
-  });
-  
-  Route::post('/upload-dataset', [PredictionController::class, 'uploadDataset'])->name('upload-dataset')->withoutMiddleware('web');
 
+});

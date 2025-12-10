@@ -107,28 +107,28 @@ class PredictionController extends Controller
         }
     }
 
-    public function uploadDataset()
-    {
-        $currentMonth = now()->month;
-        $date = Carbon::createFromDate(now()->year, $currentMonth)->format('M Y');
+    // public function uploadDataset()
+    // {
+    //     $currentMonth = now()->month;
+    //     $date = Carbon::createFromDate(now()->year, $currentMonth)->format('M Y');
 
-        try {
-            UploadDatasetJob::dispatch($currentMonth);
-            Log::debug("Dataset period $date upload in background process...");
+    //     try {
+    //         UploadDatasetJob::dispatch($currentMonth);
+    //         Log::debug("Dataset period $date upload in background process...");
 
-            return response()->json([
-                'success' => true,
-                'message' => "Dataset period $date upload in background process",
-            ]);
+    //         return response()->json([
+    //             'success' => true,
+    //             'message' => "Dataset period $date upload in background process",
+    //         ]);
 
-        } catch (\Throwable $th) {
-            Log::error("Dataset period $date gagal diupload", ['error' => $th->getMessage()]);
-            throw $th;
+    //     } catch (\Throwable $th) {
+    //         Log::error("Dataset period $date gagal diupload", ['error' => $th->getMessage()]);
+    //         throw $th;
 
-            return response()->json([
-                'success' => false,
-                'message' => "Dataset period $date gagal diupload",
-            ], 500);
-        }
-    }
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => "Dataset period $date gagal diupload",
+    //         ], 500);
+    //     }
+    // }
 }

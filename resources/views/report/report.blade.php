@@ -84,6 +84,44 @@
                                 Semua Transaksi
                             </div>
                             <div class="card-body">
+                                <div class="my-3">
+                                    <div class="row">
+                                        <div class="col">
+                                            <div id="responseMessage">
+                                                {{-- <div class="alert alert-success">
+                                                    Laporan periode $newDate sedang diproses dan akan siap
+                                                    diunduh setelah selesai
+                                                </div> --}}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <div class="col-md-4">
+
+                                            <form id="downloadReportForm">
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-bold">Unduh Laporan Per Bulan</label>
+
+                                                    <div class="d-flex align-self-stretch gap-2">
+                                                        <input type="month" class="form-control flex-shrink"
+                                                            id="date" name="date">
+
+                                                        <button class="btn btn-primary w-50" type="submit"
+                                                            id="btnDownloadReport">
+                                                            <i class="fa-solid fa-download"></i> Download
+                                                        </button>
+                                                    </div>
+
+                                                    <div class="invalid-feedback d-block" id="error-date"></div>
+                                                </div>
+                                            </form>
+
+                                        </div>
+                                    </div>
+
+                                </div>
+
                                 <table class="table table-bordered datatable">
                                     <thead>
                                         <tr>
@@ -122,7 +160,154 @@
             @include('include.footer')
         </div>
     </div>
+
     @include('include.script')
+
+    <script>
+        let taskInterval = null;
+
+        // ====== Handle Pooling - Download Report ======
+        function poolDownloadReport(payload) {
+            const {
+                event,
+                taskId,
+                taskCategory
+            } = payload;
+
+            event.preventDefault();
+
+            $.ajax({
+                url: `/reports/pooling/download/${taskId}/${taskCategory}`,
+                method: "GET",
+                // signal: controller.signal,
+                success: function(response) {
+                    const {
+                        data,
+                        message
+                    } = response;
+
+                    console.log("Polling:", response);
+
+                    $('#responseMessage').html(
+                        `<div class="alert alert-success">
+                          ${message}
+                         </div>`
+                    );
+
+                    if (data) {
+                        window.location.href = data.filepath;
+                        clearInterval(taskInterval); // stop loop checking when data not null
+                        return;
+                    }
+                },
+                error: function(xhr) {
+                    const {
+                        status,
+                        responseJSON: response
+                    } = xhr;
+                    console.error(xhr)
+                    console.log(response)
+                    clearInterval(taskInterval);
+                }
+            });
+        }
+
+        // ====== Handle Form - Trigger Download Report ======
+        function clearErrors() {
+            $('.is-invalid').removeClass('is-invalid'); // hapus class error
+            $('.invalid-feedback').html(''); // kosongkan pesan
+            $("#responseMessage").html(''); // hapus alert 422
+        }
+
+        $('#downloadReportForm').submit(function(event) {
+            event.preventDefault();
+
+            $.ajax({
+                url: "{{ route('report.trigger.download') }}",
+                method: "POST",
+                data: $(this).serialize(),
+                headers: {
+                    "X-CSRF-TOKEN": '{{ csrf_token() }}'
+                },
+                beforeSend: function() {
+                    $('#loadingReport')
+                        .html(
+                            `<div class="spinner-border" role="status">
+                                  <span class="visually-hidden">Loading...</span>
+                                </div>`
+                        );
+                    $('#btnDownloadReport').prop('disabled', true).html(
+                        `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            Loading...`
+                    )
+                },
+                success: function(response) {
+                    const {
+                        message,
+                        data: {
+                            taskId,
+                            taskCategory
+                        }
+                    } = response;
+
+                    console.log("Trigger Download:", response)
+
+                    // loop every 5 sec
+                    $('#responseMessage').html(
+                        `<div class="alert alert-success">
+                                ${message}
+                             </div>`
+                    );
+                    $('#btnDownloadReport').prop('disabled', false).html(
+                        '<i class="fa-solid fa-download"></i> Download'
+                    )
+
+                    const payload = {
+                        event,
+                        taskId,
+                        taskCategory
+                    }
+                    taskInterval = setInterval(() => {
+
+                        poolDownloadReport(payload);
+                    }, 5000);
+
+                },
+                error: function(xhr) {
+                    const {
+                        status,
+                        responseJSON: response
+                    } = xhr;
+                    const {
+                        errors
+                    } = response;
+
+                    // console.error(response, xhr)
+
+                    $('#btnDownloadReport').prop('disabled', false).html(
+                        '<i class="fa-solid fa-download"></i> Download'
+                    )
+
+                    if (status === 422 && errors) {
+                        errors.map(({
+                            key,
+                            message
+                        }) => {
+                            $(`#${key}`).addClass('is-invalid')
+                            $(`#error-${key}`).html(message)
+                        });
+                        return;
+                    }
+
+                    $("#responseMessage").html(
+                        `<div class="alert alert-danger">
+                        Terjadi kesalahan saat proses unduh.
+                      </div>`
+                    );
+                }
+            });
+        })
+    </script>
 </body>
 
 </html>

@@ -239,7 +239,7 @@
                     console.error(xhr.responseJSON?.message)
                     $('#buttonSubmit').removeClass('disabled');
                     $("#loading").html(
-                        `<div class="alert alert-danger">${"Terjadi kesalahan pada server"}</div>`
+                        '<div class="alert alert-danger">Terjadi kesalahan pada server</div>'
                     );
                 }
             });
