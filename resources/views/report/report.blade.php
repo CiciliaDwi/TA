@@ -164,54 +164,6 @@
     @include('include.script')
 
     <script>
-        let taskInterval = null;
-
-        // ====== Handle Pooling - Download Report ======
-        function poolDownloadReport(payload) {
-            const {
-                event,
-                taskId,
-                taskCategory
-            } = payload;
-
-            event.preventDefault();
-
-            $.ajax({
-                url: `/reports/pooling/download/${taskId}/${taskCategory}`,
-                method: "GET",
-                // signal: controller.signal,
-                success: function(response) {
-                    const {
-                        data,
-                        message
-                    } = response;
-
-                    console.log("Polling:", response);
-
-                    $('#responseMessage').html(
-                        `<div class="alert alert-success">
-                          ${message}
-                         </div>`
-                    );
-
-                    if (data) {
-                        window.location.href = data.filepath;
-                        clearInterval(taskInterval); // stop loop checking when data not null
-                        return;
-                    }
-                },
-                error: function(xhr) {
-                    const {
-                        status,
-                        responseJSON: response
-                    } = xhr;
-                    console.error(xhr)
-                    console.log(response)
-                    clearInterval(taskInterval);
-                }
-            });
-        }
-
         // ====== Handle Form - Trigger Download Report ======
         function clearErrors() {
             $('.is-invalid').removeClass('is-invalid'); // hapus class error
@@ -268,7 +220,7 @@
                         taskCategory
                     }
                     taskInterval = setInterval(() => {
-
+                        // function at -> resources\views\include\script.blade.php
                         poolDownloadReport(payload);
                     }, 5000);
 

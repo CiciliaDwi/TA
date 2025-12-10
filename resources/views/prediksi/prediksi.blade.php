@@ -109,50 +109,7 @@
     </div>
     @include('include.script')
 
-
     <script>
-        let taskInterval = null;
-
-        // ====== Save Response Data Prediction ======
-        function saveResponsePrediction(response) {
-            $.ajax({
-                url: "{{ route('prediction.save-result') }}",
-                method: "POST",
-                data: {
-                    response
-                },
-                headers: {
-                    "X-CSRF-TOKEN": '{{ csrf_token() }}'
-                },
-                success: function(res) {
-                    if (res.success) {
-                        const message = response.message;
-                        const resultQty = response.result.result_qty;
-
-                        $("#loading").html(
-                            `<div class="alert alert-success">${message}</div>`
-                        );
-
-                        $("#resultData").removeClass('d-none');
-                        $("#resultQty").html(resultQty);
-
-                        // $("#predictForm")[0].reset(); // reset form
-
-                        clearInterval(taskInterval); // stop loop checking
-                        return;
-                    }
-                },
-                error: function() {
-                    clearInterval(taskInterval);
-                    $('#buttonSubmit').removeClass('disabled');
-
-                    $("#loading").html(
-                        `<div class="alert alert-danger">Terjadi kesalahan saat proses prediksi.</div>`
-                    );
-                },
-            })
-        }
-
         // ====== Cek status background task ======
         function checkTaskStatus(taskId) {
             $.ajax({
@@ -169,25 +126,23 @@
                         const message = response.message;
 
                         if (response.status === "DONE") {
-                            saveResponsePrediction(response);
+                            // function at -> resources\views\include\script.blade.php
+                            handleResponsePrediction(response);
                         } else {
-                            $("#loading").html(`${message}        
-                              <div class="spinner-border" role="status">
-                                  <span class="visually-hidden">Loading...</span>
-                              </div>`);
+                            $("#loading").html(message);
                         }
                     } catch (error) {
                         $("#loading").html(
                             `<div class="alert alert-danger">Terjadi kesalahan saat proses prediksi.</div>`
                         );
-                        clearInterval(taskInterval); // stop loop checking
-                    } finally {
-                        $('#buttonSubmit').removeClass('disabled');
+                        stopTaskPooling(); // stop loop checking
                     }
                 },
                 error: function() {
-                    clearInterval(taskInterval);
-                    $('#buttonSubmit').removeClass('disabled');
+                    stopTaskPooling();
+                    $('#buttonSubmit').prop('disabled', false).html(
+                        '<i class="fas fa-bolt me-1"></i> Prediksi Jumlah Unit'
+                    )
 
                     $("#loading").html(
                         `<div class="alert alert-danger">Terjadi kesalahan saat proses prediksi.</div>`
@@ -208,12 +163,11 @@
                     "X-CSRF-TOKEN": '{{ csrf_token() }}'
                 },
                 beforeSend: function() {
-                    $("#loading").html(`Processing request, please wait...         
-                        <div class="spinner-border" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>`);
-                    $('#buttonSubmit').addClass('disabled');
-
+                    $("#loading").html(`Processing request, please wait...`);
+                    $('#buttonSubmit').prop('disabled', true).html(
+                        `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            Loading...`
+                    )
                     $("#resultData").addClass('d-none');
                     $("#resultQty").val('');
                 },
@@ -222,10 +176,7 @@
                     const taskId = response.task_id;
                     const message = response.message;
 
-                    $("#loading").html(`${message}        
-                        <div class="spinner-border" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>`);
+                    $("#loading").html(message);
 
                     // delay 5 detik sebelum polling pertama
                     setTimeout(() => {
@@ -237,7 +188,9 @@
                 },
                 error: function(xhr) {
                     console.error(xhr.responseJSON?.message)
-                    $('#buttonSubmit').removeClass('disabled');
+                    $('#buttonSubmit').prop('disabled', false).html(
+                        '<i class="fas fa-bolt me-1"></i> Prediksi Jumlah Unit'
+                    )
                     $("#loading").html(
                         '<div class="alert alert-danger">Terjadi kesalahan pada server</div>'
                     );

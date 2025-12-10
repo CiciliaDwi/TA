@@ -98,23 +98,34 @@ class ReportController extends Controller
     {
         $taskResults = getState(STATE_TASK_RESULT);
         $collection = collect($taskResults);
-        $data = $collection->where('taskId', $taskId)->where('taskCategory', $taskCategory)->first();
+        $task = $collection->where('taskId', $taskId)->where('taskCategory', $taskCategory)->first();
 
-        if (!$data) {
+        if (! $task) {
             return response()->json([
                 'success' => true,
                 'message' => 'Laporan sedang diproses. Mohon tunggu sebentar...',
                 'data' => null,
             ]);
         }
-       $collection->where('taskId', $taskId)->pop();
-       $newTaskResults = $collection->toArray();
-       setState(STATE_TASK_RESULT, $newTaskResults);
+
+        if ($task['status'] === TASK_FAILED) {
+            $period = $task['period'];
+
+            return response()->json([
+                'success' => false,
+                'message' => "Laporan Periode $period tidak ditemukan.",
+            ]);
+        }
+
+        $collection->where('taskId', $taskId)->pop();
+        $newTaskResults = $collection->toArray();
+        setState(STATE_TASK_RESULT, $newTaskResults);
 
         return response()->json([
             'success' => true,
             'message' => 'Laporan berhasil diproses dan siap diunduh.',
-            'data' => $data,
+            'data' => $task,
         ]);
+
     }
 }

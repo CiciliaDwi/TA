@@ -50,7 +50,19 @@ class UploadDatasetJob implements ShouldQueue
             ->get();
 
         if ($details->isEmpty()) {
-            Log::warning("⚠ Report periode $period kosong, skip upload.");
+            Log::warning("⚠ Report periode $period tidak ditemukan, skip upload.");
+
+            $taskResults = getState(STATE_TASK_RESULT, []);
+            $collection = collect($taskResults);
+            $result = [
+                'taskId' => $this->taskId,
+                'taskCategory' => $this->taskCategory,
+                'status' => TASK_FAILED,
+                'period' => $period,
+            ];
+            $collection->push($result);
+            $parseResults = $collection->toArray();
+            setState(STATE_TASK_RESULT, $parseResults);
 
             return;
         }
@@ -94,19 +106,19 @@ class UploadDatasetJob implements ShouldQueue
         fclose($handle);
 
         // Upload to FastAPI
-        // $fileContent = file_get_contents($path);
-        // $response = $this->connectorClient
-        //     ->attach('file', $fileContent, $filename)
-        //     ->post('/upload-dataset');
+        $fileContent = file_get_contents($path);
+        $response = $this->connectorClient
+            ->attach('file', $fileContent, $filename)
+            ->post('/upload-dataset');
 
-        // if ($response->failed()) {
-        //     throw new \Exception('Gagal upload ke FastAPI: '.$response->body());
-        // }
+        if ($response->failed()) {
+            throw new \Exception('Gagal upload ke FastAPI: '.$response->body());
+        }
 
-        // Log::info("📦 Dataset $period berhasil diupload", [
-        //     'filename' => $filename,
-        //     'response' => $response->json(),
-        // ]);
+        Log::info("📦 Dataset $period berhasil diupload", [
+            'filename' => $filename,
+            'response' => $response->json(),
+        ]);
 
         $taskResults = getState(STATE_TASK_RESULT, []);
         $collection = collect($taskResults);
@@ -115,7 +127,7 @@ class UploadDatasetJob implements ShouldQueue
             'taskCategory' => $this->taskCategory,
             'status' => TASK_SUCCESS,
             'filename' => $filename,
-            'filepath' => asset("storage/".$filepath)
+            'filepath' => asset('storage/'.$filepath),
         ];
         $collection->push($result);
         $parseResults = $collection->toArray();

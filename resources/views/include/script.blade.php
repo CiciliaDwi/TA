@@ -177,3 +177,116 @@
     // Jalankan sekali saat halaman dimuat
     updateDateTime();
 </script>
+
+
+<script>
+    // ====== Handle Task Interval ======
+    let taskInterval = null;
+
+    function stopTaskPooling() {
+        if (taskInterval) {
+            clearInterval(taskInterval);
+            return;
+        }
+    }
+
+    // ====== Save Response Data Prediction ======
+    function handleResponsePrediction(taskStatusResponse) {
+        $.ajax({
+            url: "{{ route('prediction.save-result') }}",
+            method: "POST",
+            data: {
+                response: taskStatusResponse
+            },
+            headers: {
+                "X-CSRF-TOKEN": '{{ csrf_token() }}'
+            },
+            beforeSend: function() {
+                $('#buttonSubmit').prop('disabled', true).html(
+                    `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            Loading...`
+                )
+            },
+            success: function(response) {
+                if (response.success) {
+                    const message = taskStatusResponse.message;
+                    const resultQty = taskStatusResponse.result.result_qty;
+
+                    $("#loading").html(
+                        `<div class="alert alert-success">${message}</div>`
+                    );
+
+                    $("#resultData").removeClass('d-none');
+                    $("#resultQty").html(resultQty);
+
+                    // $("#predictForm")[0].reset(); // reset form
+
+                    stopTaskPooling(); // stop loop checking
+                    $('#buttonSubmit').prop('disabled', false).html(
+                        '<i class="fas fa-bolt me-1"></i> Prediksi Jumlah Unit'
+                    )
+                }
+            },
+            error: function() {
+                stopTaskPooling();
+                $('#buttonSubmit').prop('disabled', false).html(
+                    '<i class="fas fa-bolt me-1"></i> Prediksi Jumlah Unit'
+                )
+
+                $("#loading").html(
+                    `<div class="alert alert-danger">Terjadi kesalahan saat proses prediksi.</div>`
+                );
+            },
+        })
+    }
+
+    // ====== Handle Pooling - Download Report ======
+    function poolDownloadReport(payload) {
+        const {
+            event,
+            taskId,
+            taskCategory
+        } = payload;
+
+        event.preventDefault();
+
+        $.ajax({
+            url: `/reports/pooling/download/${taskId}/${taskCategory}`,
+            method: "GET",
+            // signal: controller.signal,
+            success: function(response) {
+                const {
+                    success,
+                    data,
+                    message
+                } = response;
+
+                console.log("Polling:", response);
+
+                if (success && data) {
+                    $('#responseMessage').html(
+                        `<div class="alert alert-success">${message}</div>`
+                    );
+
+                    window.location.href = data.filepath;
+                    stopTaskPooling(); // stop loop checking when data not null
+                    return;
+                }
+
+                $('#responseMessage').html(
+                    `<div class="alert alert-warning">${message}</div>`
+                );
+                stopTaskPooling();
+            },
+            error: function(xhr) {
+                const {
+                    status,
+                    responseJSON: response
+                } = xhr;
+                console.error(xhr)
+                console.log(response)
+                stopTaskPooling();
+            }
+        });
+    }
+</script>
